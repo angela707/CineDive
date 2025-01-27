@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    id(libs.plugins.parcelize.get().pluginId)
 }
 
 android {
@@ -51,8 +52,13 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    implementation(libs.material.icons.extended)
+    implementation(libs.compose.coil)
     implementation(libs.compose.destinations.core)
     ksp(libs.compose.destinations.ksp)
+
+
+    implementation(libs.kotlinx.collections.immutable)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
