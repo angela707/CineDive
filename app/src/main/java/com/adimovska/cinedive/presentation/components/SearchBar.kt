@@ -3,8 +3,10 @@ package com.adimovska.cinedive.presentation.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -23,6 +25,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -30,6 +33,7 @@ import androidx.compose.ui.unit.dp
 fun SearchBar(
     modifier: Modifier = Modifier,
     hint: String = "",
+    input: String = "",
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     textColor: Color = MaterialTheme.colorScheme.onBackground,
     hintColor: Color = MaterialTheme.colorScheme.onTertiary,
@@ -37,9 +41,10 @@ fun SearchBar(
         fontSize = MaterialTheme.typography.bodyLarge.fontSize,
         lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
     ),
-    onSearch: (String) -> Unit
+    trailingContent: @Composable (() -> Unit)? = null,
+    onSearch: (String) -> Unit,
 ) {
-    var text by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf(input) }
     var isHintDisplayed by remember { mutableStateOf(hint.isNotEmpty()) }
 
     Box(
@@ -85,10 +90,17 @@ fun SearchBar(
                     Text(
                         text = hint,
                         style = textStyle.copy(color = hintColor),
+                        maxLines = 1,
                         modifier = Modifier
-                            .align(Alignment.CenterStart)
+                            .align(Alignment.CenterStart),
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
+            }
+
+            trailingContent?.let {
+                Spacer(modifier = Modifier.width(8.dp))
+                trailingContent()
             }
         }
     }
@@ -100,6 +112,7 @@ fun SearchBar(
 fun SearchBarPreview() {
     SearchBar(
         hint = "Some hint",
-        onSearch = {}
+        onSearch = {},
+        input = ""
     )
 }
