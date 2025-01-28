@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">CineDive</string>
-    <string name="search_bar_hint">Search movies</string>
+    <string name="search_bar_hint">Search movies, tv shows…</string>
+    <string name="error_service_unavailable">Oops, an error happened. Please try again later.</string>
+    <string name="client_error">Oops, an error happened. Please contact for support.</string>
+    <string name="server_error">An error happened. Please try again later.</string>
+    <string name="unknown_error">Oops, an unknown error happened.</string>
+    <string name="close">Close</string>
+    <string name="open">Open</string>
+    <string name="movies">Movies</string>
+    <string name="tv_shows">TV Shows</string>
 </resources>
