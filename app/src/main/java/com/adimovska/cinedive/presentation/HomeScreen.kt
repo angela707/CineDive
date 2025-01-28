@@ -1,31 +1,47 @@
 package com.adimovska.cinedive.presentation
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.adimovska.cinedive.R
-import com.adimovska.cinedive.domain.models.Movie
+import com.adimovska.cinedive.domain.models.MediaItem
+import com.adimovska.cinedive.domain.models.MediaType
+import com.adimovska.cinedive.domain.util.MoviesError
+import com.adimovska.cinedive.domain.util.MoviesException
+import com.adimovska.cinedive.presentation.components.MediaDropDown
 import com.adimovska.cinedive.presentation.components.MovieCard
 import com.adimovska.cinedive.presentation.components.SearchBar
 import com.adimovska.cinedive.presentation.destinations.MovieDetailsScreenDestination
+import com.adimovska.cinedive.presentation.models.MovieEvent
 import com.adimovska.cinedive.presentation.navigation.HomeGraph
 import com.adimovska.cinedive.presentation.preview_providers.MoviesPreviewProvider
+import com.adimovska.cinedive.presentation.preview_providers.createMockLazyPagingItems
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toPersistentList
 
 
 @HomeGraph(start = true)
@@ -33,45 +49,35 @@ import kotlinx.collections.immutable.toPersistentList
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    navController: DestinationsNavigator
+    navController: DestinationsNavigator,
+    viewModel: MovieViewModel = hiltViewModel()
 ) {
 
-    //todo remove once the api is implemented
-    val movies = listOf(
-        Movie(
-            id = 1,
-            title = "Sonic the Hedgehog 3 and some extra to make a long title",
-            releaseDate = "Dec 19 2024",
-            overview = "Sonic, Knuckles, and Tails reunite against a powerful new adversary...",
-            backdropPath = "https://image.tmdb.org/t/p/original/b85bJfrTOSJ7M5Ox0yp4lxIxdG1.jpg",
-            posterPath = "https://image.tmdb.org/t/p/original/d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg",
-            adult = false,
-            genreIds = listOf(3, 4, 6),
-            voteAverage = 5.4
-        ),
-        Movie(
-            id = 539972,
-            title = "Kraven the Hunter",
-            releaseDate = "Dec 11 2024",
-            overview = "Kraven Kravinoff's complex relationship with his ruthless gangster father, Nikolai, starts him down a path of vengeance with brutal consequences, motivating him to become not only the greatest hunter in the world, but also one of its most feared.",
-            backdropPath = "https://image.tmdb.org/t/p/original/v9Du2HC3hlknAvGlWhquRbeifwW.jpg",
-            posterPath = "https://image.tmdb.org/t/p/original/i47IUSsN126K11JUzqQIOi1Mg1M.jpg",
-            genreIds = listOf(28, 878, 12, 14, 53),
-            adult = false,
-            voteAverage = 3.2
-        ),
-        Movie(
-            id = 993710,
-            title = "Back in Action",
-            releaseDate = "Jan 15 2025",
-            overview = "Fifteen years after vanishing from the CIA to start a family, elite spies Matt and Emily jump back into the world of espionage when their cover is blown.",
-            backdropPath = "https://image.tmdb.org/t/p/original/xZm5YUNY3PlYD1Q4k7X8zd2V4AK.jpg",
-            posterPath = "https://image.tmdb.org/t/p/original/3L3l6LsiLGHkTG4RFB2aBA6BttB.jpg",
-            genreIds = listOf(28, 35),
-            adult = true,
-            voteAverage = 8.7
-        )
-    )
+    val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+    val movies = viewModel.uiMediaState.collectAsLazyPagingItems()
+
+    val loadState = movies.loadState
+    LaunchedEffect(loadState) {
+        loadState.handleErrors { error ->
+            viewModel.onEvent(MovieEvent.OnError(error))
+        }
+    }
+
+    LaunchedEffect(key1 = state.error) {
+        val message = when (state.error) {
+            MoviesError.SERVICE_UNAVAILABLE -> context.getString(R.string.error_service_unavailable)
+            MoviesError.CLIENT_ERROR -> context.getString(R.string.client_error)
+            MoviesError.SERVER_ERROR -> context.getString(R.string.server_error)
+            MoviesError.UNKNOWN_ERROR -> context.getString(R.string.unknown_error)
+            else -> null
+        }
+
+        message?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+            viewModel.onEvent(MovieEvent.OnErrorSeen)
+        }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -80,12 +86,16 @@ fun HomeScreen(
     ) { paddingValues ->
         HomeScreenContent(
             modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
-            movieList = movies.toPersistentList(),
-            onSearch = {},
+            mediaItemList = movies,
+            onEvent = viewModel::onEvent,
+            isSearching = state.isSearching,
+            selectedMediaType = state.selectedMedia,
+            isChoosingMedia = state.isChoosingMedia,
+            searchQuery = state.searchQuery,
             onCardSelected = { movie ->
                 navController.navigate(
                     MovieDetailsScreenDestination(
-                        movie = movie
+                        mediaItem = movie
                     )
                 )
             }
@@ -93,34 +103,76 @@ fun HomeScreen(
     }
 }
 
+private fun CombinedLoadStates.handleErrors(onError: (MoviesError) -> Unit) {
+    listOf(refresh, append).forEach { state ->
+        if (state is LoadState.Error) {
+            val exception = state.error as? MoviesException
+            val error = exception?.error ?: MoviesError.UNKNOWN_ERROR
+            onError(error)
+        }
+    }
+}
+
 @Composable
 fun HomeScreenContent(
     modifier: Modifier = Modifier,
-    movieList: ImmutableList<Movie>,
-    onSearch: (String) -> Unit,
-    onCardSelected: (Movie) -> Unit
+    mediaItemList: LazyPagingItems<MediaItem>,
+    isChoosingMedia: Boolean,
+    isSearching: Boolean,
+    selectedMediaType: MediaType,
+    searchQuery: String,
+    onCardSelected: (MediaItem) -> Unit,
+    onEvent: (MovieEvent) -> Unit,
 ) {
     Column(
         modifier = modifier
             .padding(16.dp)
     ) {
         SearchBar(
+            input = searchQuery,
             hint = stringResource(R.string.search_bar_hint),
-            onSearch = onSearch
+            trailingContent = {
+                MediaDropDown(
+                    selectedType = selectedMediaType,
+                    isOpen = isChoosingMedia,
+                    onClick = {
+                        onEvent(MovieEvent.OpenMediaTypeDropDown)
+                    },
+                    onDismiss = {
+                        onEvent(MovieEvent.StopChoosingMediaType)
+                    },
+                    onSelectType = {
+                        onEvent(MovieEvent.ChooseMediaType(it))
+                    }
+                )
+            },
+            onSearch = {
+                onEvent(MovieEvent.Search(it))
+            }
         )
 
-        MovieList(
-            movieList = movieList,
-            onCardSelected = onCardSelected
-        )
+        if (isSearching) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        } else {
+            MovieList(
+                mediaItemList = mediaItemList,
+                onCardSelected = onCardSelected
+            )
+        }
     }
 }
 
 @Composable
 fun MovieList(
     modifier: Modifier = Modifier,
-    movieList: ImmutableList<Movie>,
-    onCardSelected: (Movie) -> Unit
+    mediaItemList: LazyPagingItems<MediaItem>,
+    onCardSelected: (MediaItem) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -129,14 +181,17 @@ fun MovieList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(items = movieList) { movie ->
-            MovieCard(
-                title = movie.title,
-                releaseDate = movie.releaseDate,
-                overview = movie.overview,
-                backdropPath = movie.backdropPath,
-                onClick = { onCardSelected(movie) }
-            )
+        items(mediaItemList.itemCount) { index ->
+            val movie = mediaItemList[index]
+            if (movie != null) {
+                MovieCard(
+                    title = movie.title,
+                    releaseDate = movie.releaseDate ?: "",
+                    overview = movie.overview,
+                    backdropPath = movie.backdropPath,
+                    onClick = { onCardSelected(movie) }
+                )
+            }
         }
     }
 }
@@ -145,22 +200,29 @@ fun MovieList(
 @Preview
 @Composable
 private fun HomeScreenContentPreview(
-    @PreviewParameter(MoviesPreviewProvider::class) movieList: ImmutableList<Movie>
+    @PreviewParameter(MoviesPreviewProvider::class) mediaItemList: ImmutableList<MediaItem>
 ) {
+    val lazyPagingItems = createMockLazyPagingItems(mediaItemList)
+
     HomeScreenContent(
-        movieList = movieList,
-        onSearch = { },
-        onCardSelected = { }
+        mediaItemList = lazyPagingItems,
+        isChoosingMedia = false,
+        isSearching = false,
+        selectedMediaType = MediaType.MOVIE,
+        onCardSelected = { },
+        onEvent = { },
+        searchQuery = ""
     )
 }
 
 @Preview
 @Composable
 private fun MovieListPreview(
-    @PreviewParameter(MoviesPreviewProvider::class) movieList: ImmutableList<Movie>
+    @PreviewParameter(MoviesPreviewProvider::class) mediaItemList: ImmutableList<MediaItem>
 ) {
+    val lazyPagingItems = createMockLazyPagingItems(mediaItemList)
     MovieList(
-        movieList = movieList,
+        mediaItemList = lazyPagingItems,
         onCardSelected = {}
     )
 }

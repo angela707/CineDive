@@ -40,8 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.adimovska.cinedive.R
-import com.adimovska.cinedive.domain.mappers.toGenres
-import com.adimovska.cinedive.domain.models.Movie
+import com.adimovska.cinedive.domain.models.MediaItem
 import com.adimovska.cinedive.presentation.navigation.HomeGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -51,7 +50,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun MovieDetailsScreen(
     modifier: Modifier = Modifier,
-    movie: Movie,
+    mediaItem: MediaItem,
     navController: DestinationsNavigator
 ) {
     Scaffold(
@@ -60,14 +59,13 @@ fun MovieDetailsScreen(
     ) { paddingValues ->
         MovieDetails(
             modifier = Modifier.padding(paddingValues),
-            title = movie.title,
-            releaseDate = movie.releaseDate,
-            overview = movie.overview,
-            backdropPath = movie.backdropPath,
-            posterPath = movie.posterPath,
-            genres = movie.genreIds.toGenres(), //todo transform it once its fetched from API
-            adult = movie.adult,
-            rating = movie.voteAverage,
+            title = mediaItem.title,
+            releaseDate = mediaItem.releaseDate,
+            overview = mediaItem.overview,
+            backdropPath = mediaItem.backdropPath,
+            posterPath = mediaItem.posterPath,
+            adult = mediaItem.adult,
+            rating = mediaItem.voteAverage,
             onBackClicked = navController::popBackStack
         )
     }
@@ -77,11 +75,10 @@ fun MovieDetailsScreen(
 fun MovieDetails(
     modifier: Modifier = Modifier,
     title: String,
-    releaseDate: String,
+    releaseDate: String?,
     overview: String,
     backdropPath: String?,
     posterPath: String?,
-    genres: List<String>,
     adult: Boolean,
     rating: Double,
     onBackClicked: () -> Unit,
@@ -104,7 +101,6 @@ fun MovieDetails(
                 modifier = Modifier.padding(16.dp),
                 releaseDate = releaseDate,
                 title = title,
-                genres = genres,
                 adult = adult,
                 rating = rating,
                 overview = overview
@@ -116,10 +112,9 @@ fun MovieDetails(
 @Composable
 fun MovieInformation(
     modifier: Modifier = Modifier,
+    releaseDate: String?,
     title: String,
-    releaseDate: String,
     overview: String,
-    genres: List<String>,
     adult: Boolean,
     rating: Double,
 ) {
@@ -157,12 +152,15 @@ fun MovieInformation(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = releaseDate,
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 14.sp,
-                style = MaterialTheme.typography.labelLarge
-            )
+
+            if (releaseDate != null) {
+                Text(
+                    text = releaseDate,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 14.sp,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
 
             if (adult) {
                 Icon(
@@ -176,14 +174,6 @@ fun MovieInformation(
             }
 
         }
-
-        Text(
-            modifier = Modifier.padding(top = 8.dp),
-            text = genres.joinToString(", "),
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 14.sp,
-            style = MaterialTheme.typography.labelMedium
-        )
 
         Text(
             modifier = Modifier.padding(top = 16.dp),
@@ -318,7 +308,6 @@ fun MovieInformationPreview() {
         title = "Wicked",
         releaseDate = "28th November 2024",
         overview = "Set in the Land of Oz, before Dorothy Gale's arrival from Kansas, its plot follows Elphaba, the future Wicked Witch of the West, and her friendship with her classmate Galinda, who becomes Glinda the Good. ",
-        genres = listOf("Musical, Comedy, Drama"),
         adult = true,
         rating = 5.7
     )
