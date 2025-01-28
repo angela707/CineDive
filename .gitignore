@@ -17,6 +17,7 @@ build/
 *.hprof
 *.log
 local.properties
+apikey.properties
 *.bat
 .DS_Store
 Thumbs.db
@@ -34,3 +35,4 @@ output.json
 *.sublime-project
 *.sublime-workspace
 test-results/
+

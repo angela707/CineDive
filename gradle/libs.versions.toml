@@ -13,7 +13,17 @@ compose-destinations = "1.10.1"
 compose-coil = "2.6.0"
 kotlinx-collections-immutable = "0.3.7"
 material-icons = "1.5.1"
-
+hilt = "2.55"
+kotlinx_serialization = "1.5.1"
+retrofit = "2.9.0"
+hiltNavigationCompose = "1.2.0"
+timber = "5.0.1"
+okhttp = "5.0.0-alpha.11"
+multidex = "2.0.1"
+gson = "2.10.1"
+room = "2.6.1"
+paging = "3.2.1"
+paging-compose = "1.0.0-alpha19"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,9 +49,54 @@ compose-destinations-ksp = { group = "io.github.raamcosta.compose-destinations",
 compose-coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "compose-coil" }
 material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "material-icons" }
 
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
+hilt-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
+hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+
+paging-runtime = { group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "paging" }
+paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging-compose" }
+
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-converter = { group = "com.squareup.retrofit2", name = "converter-moshi", version.ref = "retrofit" }
+logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx_serialization" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+retrofit-gson-converter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+androidx-multidex = { group = "androidx.multidex", name = "multidex", version.ref = "multidex" }
+
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 parcelize = { id = "kotlin-parcelize" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+[bundles]
+retrofit = [
+    "retrofit",
+    "retrofit-converter",
+    "retrofit-gson-converter",
+    "gson"
+]
+
+room = [
+    "room-runtime",
+    "room-ktx",
+    "room-paging"
+]
+
+paging = [
+    "paging-compose",
+    "paging-runtime"
+]
