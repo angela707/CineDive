@@ -55,6 +55,12 @@ android {
         compose = true
         buildConfig = true
     }
+
+    testOptions.unitTests.apply {
+        all {
+            it.useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
@@ -91,11 +97,19 @@ dependencies {
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
 
-    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.bundles.jupiter.test)
+    testImplementation(libs.kotlinx.test.coroutine)
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.cash.turbine)
+    testImplementation(libs.mockk)
+    testImplementation(libs.paging.common)
+
 }
