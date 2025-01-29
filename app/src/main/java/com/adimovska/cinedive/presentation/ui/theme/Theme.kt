@@ -1,4 +1,4 @@
-package com.adimovska.cinedive.ui.theme
+package com.adimovska.cinedive.presentation.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

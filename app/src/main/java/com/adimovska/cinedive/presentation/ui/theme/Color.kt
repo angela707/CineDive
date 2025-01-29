@@ -1,4 +1,4 @@
-package com.adimovska.cinedive.ui.theme
+package com.adimovska.cinedive.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
