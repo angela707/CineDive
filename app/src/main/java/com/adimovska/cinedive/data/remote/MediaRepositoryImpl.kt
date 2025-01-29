@@ -1,4 +1,4 @@
-package com.adimovska.cinedive.data.repository
+package com.adimovska.cinedive.data.remote
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
@@ -7,7 +7,6 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.adimovska.cinedive.data.local.MovieDatabase
 import com.adimovska.cinedive.data.remote.AppConfig.PAGE_SIZE
-import com.adimovska.cinedive.data.remote.MovieApi
 import com.adimovska.cinedive.data.remote.mappers.toMediaItem
 import com.adimovska.cinedive.data.remote.paging_sources.MoviesRemoteMediator
 import com.adimovska.cinedive.data.remote.paging_sources.SearchMoviesPagingSource

@@ -6,7 +6,7 @@ import com.adimovska.cinedive.data.local.MovieDatabase
 import com.adimovska.cinedive.data.remote.AppConfig.BASE_URL
 import com.adimovska.cinedive.data.remote.AuthInterceptor
 import com.adimovska.cinedive.data.remote.MovieApi
-import com.adimovska.cinedive.data.repository.MediaRepositoryImpl
+import com.adimovska.cinedive.data.remote.MediaRepositoryImpl
 import com.adimovska.cinedive.domain.repository.MediaRepository
 import dagger.Module
 import dagger.Provides
