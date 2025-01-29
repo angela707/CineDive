@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.adimovska.cinedive.presentation.NavGraphs
-import com.adimovska.cinedive.ui.theme.CineDiveTheme
+import com.adimovska.cinedive.presentation.ui.theme.CineDiveTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 import dagger.hilt.android.AndroidEntryPoint
 
