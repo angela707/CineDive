@@ -26,7 +26,7 @@ CineDive is an Android application built with Kotlin and Jetpack Compose. It all
 
 ## 🏛️ Architecture
 
-- **MVVI Pattern**: Ensures separation of concerns, making the codebase scalable and maintainable.
+- **MVVM Pattern**: Ensures separation of concerns, making the codebase scalable and maintainable.
 - **Clean Architecture**: Divided into layers for better code organization and testability.
 - **Sealed Classes & Enums**: Used for efficient state and error management.
 
